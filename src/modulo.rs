@@ -99,4 +99,10 @@ mod tests {
         let x = Field::new(2, 5) / Field::new(3, 5);
         assert_eq!(x, Field::new(4, 5));
     }
+    #[test]
+    fn neg_test() {
+        let x = !Field::new(1, 2);
+        assert_eq!(x, Field::new(0, 2));
+        assert_eq!(!x, Field::new(1, 2));
+    }
 }
