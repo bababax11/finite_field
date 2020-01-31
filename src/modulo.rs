@@ -1,4 +1,4 @@
-use std::ops::{Add, Div, Mul, Neg, Not, Sub};
+use std::ops;
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Field {
     v: i32,
@@ -12,7 +12,7 @@ impl Field {
         }
     }
 }
-impl Neg for Field {
+impl ops::Neg for Field {
     type Output = Field;
     fn neg(self) -> Self {
         Self {
@@ -21,7 +21,7 @@ impl Neg for Field {
         }
     }
 }
-impl Not for Field {
+impl ops::Not for Field {
     type Output = Field;
     fn not(self) -> Self {
         if self.n == 2 {
@@ -37,7 +37,7 @@ impl Not for Field {
         }
     }
 }
-impl Add for Field {
+impl ops::Add for Field {
     type Output = Field;
 
     fn add(self, other: Field) -> Self {
@@ -48,7 +48,13 @@ impl Add for Field {
         }
     }
 }
-impl Sub for Field {
+impl ops::AddAssign for Field {
+    fn add_assign(&mut self, other: Field) {
+        assert_eq!(self.n, other.n);
+        self.v = (self.v + other.v) % (self.n as i32);
+    }
+}
+impl ops::Sub for Field {
     type Output = Field;
     fn sub(self, other: Field) -> Self {
         assert_eq!(self.n, other.n);
@@ -58,7 +64,13 @@ impl Sub for Field {
         }
     }
 }
-impl Mul for Field {
+impl ops::SubAssign for Field {
+    fn sub_assign(&mut self, other: Field) {
+        assert_eq!(self.n, other.n);
+        self.v = (self.v - other.v) % (self.n as i32);
+    }
+}
+impl ops::Mul for Field {
     type Output = Field;
     fn mul(self, other: Field) -> Self {
         assert_eq!(self.n, other.n);
@@ -68,11 +80,23 @@ impl Mul for Field {
         }
     }
 }
-impl Div for Field {
+impl ops::MulAssign for Field {
+    fn mul_assign(&mut self, other: Field) {
+        assert_eq!(self.n, other.n);
+        self.v = (self.v * other.v) % (self.n as i32);
+    }
+}
+impl ops::Div for Field {
     type Output = Field;
     fn div(self, other: Field) -> Self {
         assert_eq!(self.n, other.n);
         self * (!other)
+    }
+}
+impl ops::DivAssign for Field {
+    fn div_assign(&mut self, other: Field) {
+        assert_eq!(self.n, other.n);
+        *self *= !other;
     }
 }
 #[cfg(test)]
@@ -81,8 +105,10 @@ mod tests {
 
     #[test]
     fn add_test() {
-        let x = Field::new(1, 3) + Field::new(4, 3);
+        let mut x = Field::new(1, 3) + Field::new(4, 3);
         assert_eq!(x, Field::new(2, 3));
+        x += x.clone();
+        assert_eq!(x, Field::new(1, 3));
     }
     #[test]
     fn sub_test() {
@@ -96,8 +122,10 @@ mod tests {
     }
     #[test]
     fn div_test() {
-        let x = Field::new(2, 5) / Field::new(3, 5);
+        let mut x = Field::new(2, 5) / Field::new(3, 5);
         assert_eq!(x, Field::new(4, 5));
+        x /= x.clone();
+        assert_eq!(x, Field::new(1, 5));
     }
     #[test]
     fn neg_test() {
