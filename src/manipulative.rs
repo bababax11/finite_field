@@ -106,14 +106,14 @@ mod tests {
     fn add_test() {
         let a = Manipulative::new(vec![1, 5]);
         let b = Manipulative::new(vec![2, 2, 3]);
-        assert_eq!((a.clone() + b.clone()).factors, vec![3, 7, 3]);
-        assert_eq!((b + a).factors, vec![3, 7, 3]);
+        assert_eq!((a.clone() + b.clone()).factors, [3, 7, 3]);
+        assert_eq!((b + a).factors, [3, 7, 3]);
     }
     #[test]
     fn sub_test() {
         let a = Manipulative::new(vec![1, 5]);
         let b = Manipulative::new(vec![2, 2, 3]);
-        assert_eq!((a.clone() - b.clone()).factors, vec![-1, 3, -3]);
-        assert_eq!((b - a).factors, vec![1, -3, 3]);
+        assert_eq!((a.clone() - b.clone()).factors, [-1, 3, -3]);
+        assert_eq!((b - a).factors, [1, -3, 3]);
     }
 }
