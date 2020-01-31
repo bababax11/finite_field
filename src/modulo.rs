@@ -1,5 +1,5 @@
 use std::ops::{Add, Div, Mul, Neg, Not, Sub};
-#[derive(Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Field {
     v: i32,
     n: u32,
