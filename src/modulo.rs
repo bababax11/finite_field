@@ -1,8 +1,8 @@
 use std::ops;
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Field {
-    v: i32,
-    n: u32,
+    pub v: i32,
+    pub n: u32,
 }
 impl Field {
     pub fn new(value: i32, n: u32) -> Self {
