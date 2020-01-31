@@ -9,7 +9,7 @@ where
 }
 impl<T> Manipulative<T>
 where
-    T: Copy + AddAssign + SubAssign + Neg<Output = T> + MulAssign + DivAssign,
+    T: Copy + AddAssign + SubAssign + Neg<Output = T> + MulAssign + DivAssign + Default,
 {
     pub fn new(factors: Vec<T>) -> Self {
         Self { factors: factors }
@@ -26,6 +26,7 @@ where
         if self.factors.len() < other.factors.len() {
             min_deg = self.factors.len();
             max_deg = other.factors.len();
+            self.factors.reserve(max_deg);
             is_self_shorter = true;
         } else {
             min_deg = other.factors.len();
@@ -54,6 +55,7 @@ where
         if self.factors.len() < other.factors.len() {
             min_deg = self.factors.len();
             max_deg = other.factors.len();
+            self.factors.reserve(max_deg);
             is_self_shorter = true;
         } else {
             min_deg = other.factors.len();
