@@ -26,7 +26,7 @@ impl Not for Field {
     fn not(self) -> Self {
         if self.n == 2 {
             Self {
-                v: !self.v as i32,
+                v: (self.v == 0) as i32,
                 n: 2,
             }
         } else {
@@ -52,7 +52,10 @@ impl Sub for Field {
     type Output = Field;
     fn sub(self, other: Field) -> Self {
         assert_eq!(self.n, other.n);
-        self + (-other)
+        Self {
+            v: (self.v - other.v) % (self.n as i32),
+            n: self.n,
+        }
     }
 }
 impl Mul for Field {
