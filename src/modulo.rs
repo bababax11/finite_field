@@ -6,7 +6,10 @@ pub struct Field {
 }
 impl Field {
     pub fn new(value: i32, n: u32) -> Self {
-        Self { v: value % (n as i32), n: n}
+        Self {
+            v: value % (n as i32),
+            n: n,
+        }
     }
 }
 impl Neg for Field {
@@ -24,7 +27,7 @@ impl Not for Field {
         if self.n == 2 {
             Self {
                 v: !self.v as i32,
-                n: 2
+                n: 2,
             }
         } else {
             Self {
@@ -69,23 +72,28 @@ impl Div for Field {
         self * (!other)
     }
 }
-#[test]
-fn add() {
-    let x = Field::new(1, 3) + Field::new(4, 3);
-    assert_eq!(x, Field::new(2, 3));
-}
-#[test]
-fn sub() {
-    let x = Field::new(1, 3) - Field::new(4, 3);
-    assert_eq!(x, Field::new(0, 3));
-}
-#[test]
-fn mul() {
-    let x = Field::new(2, 5) * Field::new(4, 5);
-    assert_eq!(x, Field::new(3, 5));
-}
-#[test]
-fn div() {    
-    let x = Field::new(2, 5) / Field::new(3, 5);
-    assert_eq!(x, Field::new(4, 5));
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn add_test() {
+        let x = Field::new(1, 3) + Field::new(4, 3);
+        assert_eq!(x, Field::new(2, 3));
+    }
+    #[test]
+    fn sub_test() {
+        let x = Field::new(1, 3) - Field::new(4, 3);
+        assert_eq!(x, Field::new(0, 3));
+    }
+    #[test]
+    fn mul_test() {
+        let x = Field::new(2, 5) * Field::new(4, 5);
+        assert_eq!(x, Field::new(3, 5));
+    }
+    #[test]
+    fn div_test() {
+        let x = Field::new(2, 5) / Field::new(3, 5);
+        assert_eq!(x, Field::new(4, 5));
+    }
 }
