@@ -1,6 +1,23 @@
 use super::manipulative::Manipulative;
 use super::modulo::Field;
-fn euclid_decrypt(p: u32, n: usize, d: usize, a: i32, y: Vec<i32>) -> Manipulative<Field> {
+/// ユークリッド復号する.
+/// p: 体の標数, n: 多項式の最大次数; C={f(a^i) (0<=i<=d) = 0}を線形符号とする.
+/// y: 復号したい多項式のslice(次数の低い順)
+/// p: 素数, aの位数の判定は行わない.
+/// # Panics
+/// `2 <= d <= n` でないとき
+/// # Example
+/// ```
+/// let w = euclid_decrypt(5, 4, 3, 2, vec![1, 0, 2, 1]); // 1 + 2 x^2 + x^3
+/// assert_eq!(
+///     w,
+///     Manipulative::new([4, 0, 2, 1].iter().map(|v| Field::new(*v, 5)).collect()) // 4 + 2 x^2 + x^3
+///);
+/// ```
+pub fn euclid_decrypt(p: u32, n: usize, d: usize, a: i32, y: Vec<i32>) -> Manipulative<Field> {
+    if 2 > d || d > n {
+        panic!("dの範囲が2 <= d <= n でない")
+    }
     let y = y.iter().map(|v| Field::new(*v, p)).collect();
     let mut y = Manipulative::new(y);
 
@@ -53,6 +70,11 @@ mod tests {
         assert_eq!(
             w,
             Manipulative::new([4, 0, 2, 1].iter().map(|v| Field::new(*v, 5)).collect())
+        );
+        let w = euclid_decrypt(11, 7, 5, 2, vec![1, -1, 1, 0, 3, 2, 0, 1]);
+        assert_eq!(
+            w,
+            Manipulative::new([1, 10, 1, 8, 3, 2, 5, 1].iter().map(|v| Field::new(*v, 11)).collect())
         );
     }
 }

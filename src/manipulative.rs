@@ -56,7 +56,7 @@ where
                     return Ok((j, *d));
                 }
             }
-            Err("devide by zero")
+            Err("devided by zero")
         })()?;
         'outer: loop {
             let mut it = man_r.factors.iter().enumerate().rev();
