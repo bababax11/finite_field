@@ -48,12 +48,12 @@ where
                 let ll = it.next();
                 match ll {
                     Some((i_, l_)) => {
-                        l = *l_;
-                        i = i_;
-                        if i < j {
+                        if i_ < j {
                             break 'outer;
                         }
-                        l == Default::default()
+                        l = *l_;
+                        i = i_;
+                        l == Default::default() // 0だったら繰り返す
                     }
                     None => break 'outer,
                 }
@@ -264,6 +264,15 @@ mod tests {
             (
                 Manipulative::new(vec![2, 3, 1, 0]),
                 Manipulative::new(vec![0, 0, 0, 0, 0])
+            )
+        );
+        let a = Manipulative::new(vec![2, 3, 1, 0]);
+        let b = Manipulative::new(vec![0, 1, 0]);
+        assert_eq!(
+            a.divide_by(&b),
+            (
+                Manipulative::new(vec![3, 1, 0, 0]),
+                Manipulative::new(vec![2, 0, 0, 0])
             )
         );
         let a = Manipulative::new(vec![2, 3, 1, 0]);
