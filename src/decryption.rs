@@ -2,7 +2,7 @@ use super::manipulative::Manipulative;
 use super::modulo::Field;
 
 /// ユークリッド復号する.
-/// p: 体の標数, n: 多項式の最大次数; C={f(a^i) (0<=i<=d) = 0}を線形符号とする.
+/// p: 体の標数, n: 多項式の最大次数; C={f(a^i) (0<=i<=d-1) = 0}を線形符号とする.
 /// y: 復号したい多項式のスライス(次数の低い順)
 /// p: 素数, aの位数の判定は行わない.
 /// # Panics
