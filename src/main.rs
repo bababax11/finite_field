@@ -7,7 +7,7 @@ fn main() {
     let a = Manipulative::new(vec![1, 2, 1]);
         let b = Manipulative::new(vec![1, 1]);
         assert_eq!(
-            a.divide_by(&b),
+            a.divide_by(&b).unwrap(),
             (
                 Manipulative::new(vec![1, 1, 0]),
                 Manipulative::new(vec![0, 0, 0])

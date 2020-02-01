@@ -1,6 +1,5 @@
 use super::modulo::Field;
-use std::ops::{Add, Div, Mul, Neg, Sub};
-use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
+use std::ops::{Add, AddAssign, Div, Mul, MulAssign, Neg, Sub, SubAssign};
 #[derive(Clone, Debug, PartialEq)]
 pub struct Manipulative<T>
 where
@@ -19,8 +18,7 @@ where
         + Sub<Output = T>
         + Mul<Output = T>
         + Div<Output = T>
-        + Default
-        + Eq,
+        + PartialEq,
 {
     pub fn new(factors: Vec<T>) -> Self {
         if factors.len() == 0 {
@@ -28,18 +26,37 @@ where
         }
         Self { factors: factors }
     }
-    pub fn divide_by(&self, other: &Manipulative<T>) -> (Manipulative<T>, Manipulative<T>) {
+}
+impl<T> Manipulative<T>
+where
+    T: std::fmt::Debug
+        + Copy
+        + AddAssign
+        + SubAssign
+        + Neg<Output = T>
+        + Add<Output = T>
+        + Sub<Output = T>
+        + Mul<Output = T>
+        + Div<Output = T>
+        + Default
+        + PartialEq,
+{
+    pub fn divide_by(
+        &self,
+        other: &Manipulative<T>,
+    ) -> Result<(Manipulative<T>, Manipulative<T>), &'static str> {
         let mut man_r = self.clone();
         let mut q = Vec::with_capacity(self.factors.len());
         q.resize_with(self.factors.len(), Default::default);
-        let (j, d) = (|| { // otherの先頭要素を返す
+        let (j, d) = (|| {
+            // otherの先頭要素を返す
             for (j, d) in other.factors.iter().enumerate().rev() {
                 if *d != Default::default() {
-                    return Ok((j, *d))
+                    return Ok((j, *d));
                 }
             }
             Err("devide by zero")
-        })().unwrap();
+        })()?;
         'outer: loop {
             let mut it = man_r.factors.iter().enumerate().rev();
             let mut l;
@@ -67,9 +84,58 @@ where
             v.push(a);
             o *= Manipulative::new(v);
             man_r -= o;
-        
         }
-        (Manipulative::new(q), man_r)
+        Ok((Manipulative::new(q), man_r))
+    }
+}
+impl Manipulative<Field> {
+    pub fn divide_by(
+        &self,
+        other: &Manipulative<Field>,
+    ) -> Result<(Manipulative<Field>, Manipulative<Field>), &'static str> {
+        let mut man_r = self.clone();
+        let mut q = Vec::with_capacity(self.factors.len());
+        let mut default = unsafe { *self.factors.get_unchecked(0) };
+        default.v = 0;
+        q.resize(self.factors.len(), default);
+        let (j, d) = (|| {
+            // otherの先頭要素を返す
+            for (j, d) in other.factors.iter().enumerate().rev() {
+                if *d != default {
+                    return Ok((j, *d));
+                }
+            }
+            Err("devide by zero")
+        })()?;
+        'outer: loop {
+            let mut it = man_r.factors.iter().enumerate().rev();
+            let mut l;
+            let mut i;
+            while {
+                let ll = it.next();
+                match ll {
+                    Some((i_, l_)) => {
+                        if i_ < j {
+                            break 'outer;
+                        }
+                        l = *l_;
+                        i = i_;
+                        l == default // 0だったら繰り返す
+                    }
+                    None => break 'outer,
+                }
+            } {}
+            let a = l / d;
+            unsafe {
+                *q.get_unchecked_mut(i - j) = a;
+            }
+            let mut o = other.clone();
+            let mut v = vec![default; i - j];
+            v.push(a);
+            o *= Manipulative::new(v);
+            man_r -= o;
+        }
+        Ok((Manipulative::new(q), man_r))
     }
 }
 impl<T> AddAssign for Manipulative<T>
@@ -242,7 +308,7 @@ mod tests {
         let a = Manipulative::new(vec![1, 2, 1]);
         let b = Manipulative::new(vec![1, 1]);
         assert_eq!(
-            a.divide_by(&b),
+            a.divide_by(&b).unwrap(),
             (
                 Manipulative::new(vec![1, 1, 0]),
                 Manipulative::new(vec![0, 0, 0])
@@ -251,7 +317,7 @@ mod tests {
         let a = Manipulative::new(vec![-2, -3, -1, 0]);
         let b = Manipulative::new(vec![1, 1, 0, 0, 0]);
         assert_eq!(
-            a.divide_by(&b),
+            a.divide_by(&b).unwrap(),
             (
                 Manipulative::new(vec![-2, -1, 0, 0]),
                 Manipulative::new(vec![0, 0, 0, 0, 0, 0])
@@ -260,7 +326,7 @@ mod tests {
         let a = Manipulative::new(vec![2, 3, 1, 0]);
         let b = Manipulative::new(vec![1, 0, 0]);
         assert_eq!(
-            a.divide_by(&b),
+            a.divide_by(&b).unwrap(),
             (
                 Manipulative::new(vec![2, 3, 1, 0]),
                 Manipulative::new(vec![0, 0, 0, 0, 0])
@@ -269,7 +335,7 @@ mod tests {
         let a = Manipulative::new(vec![2, 3, 1, 0]);
         let b = Manipulative::new(vec![0, 1, 0]);
         assert_eq!(
-            a.divide_by(&b),
+            a.divide_by(&b).unwrap(),
             (
                 Manipulative::new(vec![3, 1, 0, 0]),
                 Manipulative::new(vec![2, 0, 0, 0])
@@ -278,7 +344,7 @@ mod tests {
         let a = Manipulative::new(vec![2, 3, 1, 0]);
         let b = Manipulative::new(vec![1, 1, 1, 0]);
         assert_eq!(
-            a.divide_by(&b),
+            a.divide_by(&b).unwrap(),
             (
                 Manipulative::new(vec![1, 0, 0, 0]),
                 Manipulative::new(vec![1, 2, 0, 0])
