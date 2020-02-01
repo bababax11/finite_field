@@ -37,6 +37,7 @@ where
         + Add<Output = T>
         + Sub<Output = T>
         + Mul<Output = T>
+        + MulAssign
         + Div<Output = T>
         + Default
         + PartialEq,
@@ -86,6 +87,14 @@ where
             man_r -= o;
         }
         Ok((Manipulative::new(q), man_r))
+    }
+    pub fn apply(&self, x: T) -> T {
+        let mut result = Default::default();
+        for a in self.factors.iter().rev() {
+            result *= x;
+            result += *a;
+        }
+        result
     }
 }
 impl Manipulative<Field> {
@@ -350,5 +359,10 @@ mod tests {
                 Manipulative::new(vec![1, 2, 0, 0])
             )
         );
+    }
+    #[test]
+    fn apply_test() {
+        let a = Manipulative::new(vec![2, -3, 1, 0]);
+        assert_eq!(a.apply(3), 2);
     }
 }

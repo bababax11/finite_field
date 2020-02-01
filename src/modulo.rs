@@ -48,6 +48,16 @@ impl ops::Add for Field {
         }
     }
 }
+impl ops::Add<i32> for Field {
+    type Output = Field;
+
+    fn add(self, other: i32) -> Self {
+        Self {
+            v: (self.v + other) % (self.n as i32),
+            n: self.n,
+        }
+    }
+}
 impl ops::AddAssign for Field {
     fn add_assign(&mut self, other: Field) {
         assert_eq!(self.n, other.n);
@@ -76,6 +86,16 @@ impl ops::Mul for Field {
         assert_eq!(self.n, other.n);
         Self {
             v: self.v * other.v % (self.n as i32),
+            n: self.n,
+        }
+    }
+}
+impl ops::Mul<i32> for Field {
+    type Output = Field;
+
+    fn mul(self, other: i32) -> Self {
+        Self {
+            v: (self.v * other) % (self.n as i32),
             n: self.n,
         }
     }
