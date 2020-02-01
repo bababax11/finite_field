@@ -1,6 +1,25 @@
 use super::manipulative::Manipulative;
 use super::modulo::Field;
-fn euclid_decrypt(p: u32, n: usize, d: usize, a: i32, y: Vec<i32>) -> Manipulative<Field> {
+
+/// ユークリッド復号する.
+/// p: 体の標数, n: 多項式の最大次数; C={f(a^i) (0<=i<=d) = 0}を線形符号とする.
+/// y: 復号したい多項式のslice(次数の低い順)
+/// p: 素数, aの位数の判定は行わない.
+/// # Panics
+/// `2 <= d <= n` でないとき
+/// # Example
+/// ```
+/// # use finite_field::manipulative::Manipulative;
+/// # use finite_field::modulo::Field;
+/// # use finite_field::decryption::euclid_decrypt;
+/// let w = euclid_decrypt(5, 4, 3, 2, vec![1, 0, 2, 1]); // 1 + 2 x^2 + x^3
+/// assert_eq!(
+///     w,
+///     Manipulative::new([4, 0, 2, 1].iter().map(|v| Field::new(*v, 5)).collect()) // 4 + 2 x^2 + x^3
+///);
+/// 
+/// ```
+pub fn euclid_decrypt(p: u32, n: usize, d: usize, a: i32, y: Vec<i32>) -> Manipulative<Field> {
     let y = y.iter().map(|v| Field::new(*v, p)).collect();
     let mut y = Manipulative::new(y);
 
