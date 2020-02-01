@@ -32,39 +32,42 @@ where
         let mut man_r = self.clone();
         let mut q = Vec::with_capacity(self.factors.len());
         q.resize_with(self.factors.len(), Default::default);
-        'outer: loop {
+        let (j, d) = (|| { // otherの先頭要素を返す
             for (j, d) in other.factors.iter().enumerate().rev() {
-                if *d == Default::default() {
-                    continue;
+                if *d != Default::default() {
+                    return Ok((j, *d))
                 }
-                let mut it = man_r.factors.iter().enumerate().rev();
-                let mut l;
-                let mut i;
-                while {
-                    let ll = it.next();
-                    match ll {
-                        Some((i_, l_)) => {
-                            l = *l_;
-                            i = i_;
-                            if i < j {
-                                break 'outer;
-                            }
-                            l == Default::default()
-                        }
-                        None => break 'outer,
-                    }
-                } {}
-                let a = l / *d;
-                unsafe {
-                    *q.get_unchecked_mut(i - j) = a;
-                }
-                let mut o = other.clone();
-                let mut v = vec![Default::default(); i - j];
-                v.push(a);
-                o *= Manipulative::new(v);
-                man_r -= o;
-                break;
             }
+            Err("devide by zero")
+        })().unwrap();
+        'outer: loop {
+            let mut it = man_r.factors.iter().enumerate().rev();
+            let mut l;
+            let mut i;
+            while {
+                let ll = it.next();
+                match ll {
+                    Some((i_, l_)) => {
+                        l = *l_;
+                        i = i_;
+                        if i < j {
+                            break 'outer;
+                        }
+                        l == Default::default()
+                    }
+                    None => break 'outer,
+                }
+            } {}
+            let a = l / d;
+            unsafe {
+                *q.get_unchecked_mut(i - j) = a;
+            }
+            let mut o = other.clone();
+            let mut v = vec![Default::default(); i - j];
+            v.push(a);
+            o *= Manipulative::new(v);
+            man_r -= o;
+        
         }
         (Manipulative::new(q), man_r)
     }
