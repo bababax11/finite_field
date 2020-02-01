@@ -88,7 +88,7 @@ where
         }
         Ok((Manipulative::new(q), man_r))
     }
-    pub fn apply(&self, x: T) -> T {
+    pub fn assign(&self, x: T) -> T {
         let mut result = Default::default();
         for a in self.factors.iter().rev() {
             result *= x;
@@ -145,7 +145,7 @@ impl Manipulative<Field> {
         }
         Ok((Manipulative::new(q), man_r))
     }
-    pub fn apply(&self, x: Field) -> Field {
+    pub fn assign(&self, x: Field) -> Field {
         let mut result = Field::new(0, x.n);
         for a in self.factors.iter().rev() {
             result *= x;
@@ -386,8 +386,8 @@ mod tests {
         );
     }
     #[test]
-    fn apply_test() {
+    fn assign_test() {
         let a = Manipulative::new(vec![2, -3, 1, 0]);
-        assert_eq!(a.apply(3), 2);
+        assert_eq!(a.assign(3), 2);
     }
 }

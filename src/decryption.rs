@@ -15,7 +15,7 @@ fn euclid_decrypt(p: u32, n: usize, d: usize, a: i32, y: Vec<i32>) -> Manipulati
     let mut _a = Field::new(1, p);
     for _ in 0..d - 1 {
         _a *= a;
-        r_0.push(y.apply(_a));
+        r_0.push(y.assign(_a));
     }
     let mut r_0 = Manipulative::new(r_0);
 
@@ -24,7 +24,6 @@ fn euclid_decrypt(p: u32, n: usize, d: usize, a: i32, y: Vec<i32>) -> Manipulati
     }
     loop {
         let (q, _r_0) = r_m1.divide_by(&r_0).unwrap();
-        // println!("{:?},\n{:?}\n", q, _r_0);
         r_m1 = std::mem::replace(&mut r_0, _r_0);
         let _t_0 = t_0.clone();
         t_m1 = std::mem::replace(&mut t_0, t_m1.clone() - q * _t_0);
@@ -37,8 +36,8 @@ fn euclid_decrypt(p: u32, n: usize, d: usize, a: i32, y: Vec<i32>) -> Manipulati
     let mut err = vec![Field::new(0, p); n];
     for e in &mut err {
         _a *= a_inv;
-        if t_0.apply(_a) == Field::new(0, p) {
-            *e -= r_0.apply(_a) / t_0.diff().apply(_a)
+        if t_0.assign(_a) == Field::new(0, p) {
+            *e -= r_0.assign(_a) / t_0.diff().assign(_a)
         }
     }
     y -= Manipulative::new(err);
