@@ -1,5 +1,6 @@
 use super::manipulative::Manipulative;
 use super::modulo::Field;
+
 /// ユークリッド復号する.
 /// p: 体の標数, n: 多項式の最大次数; C={f(a^i) (0<=i<=d) = 0}を線形符号とする.
 /// y: 復号したい多項式のslice(次数の低い順)
@@ -8,6 +9,9 @@ use super::modulo::Field;
 /// `2 <= d <= n` でないとき
 /// # Example
 /// ```
+/// # use finite_field::manipulative::Manipulative;
+/// # use finite_field::modulo::Field;
+/// # use finite_field::decryption::euclid_decrypt;
 /// let w = euclid_decrypt(5, 4, 3, 2, vec![1, 0, 2, 1]); // 1 + 2 x^2 + x^3
 /// assert_eq!(
 ///     w,

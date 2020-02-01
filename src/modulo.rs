@@ -31,7 +31,7 @@ impl ops::Not for Field {
             }
         } else {
             Self {
-                v: self.v.pow((self.n - 2) as u32) % self.n as i32,
+                v: self.v.pow((self.n - 2) as u32) % (self.n as i32),
                 n: self.n,
             }
         }
