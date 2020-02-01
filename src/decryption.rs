@@ -19,7 +19,9 @@ fn euclid_decrypt(p: u32, n: usize, d: usize, a: i32, y: Vec<i32>) -> Manipulati
     }
     let mut r_0 = Manipulative::new(r_0);
 
-    if r_0.deg() == -1 { return y; }
+    if r_0.deg() == -1 {
+        return y;
+    }
     loop {
         let (q, _r_0) = r_m1.divide_by(&r_0).unwrap();
         // println!("{:?},\n{:?}\n", q, _r_0);
@@ -30,7 +32,6 @@ fn euclid_decrypt(p: u32, n: usize, d: usize, a: i32, y: Vec<i32>) -> Manipulati
             break;
         }
     }
-    
     let mut _a = Field::new(a, p);
     let a_inv = !Field::new(a, p);
     let mut err = vec![Field::new(0, p); n];

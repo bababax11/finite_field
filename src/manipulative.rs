@@ -163,7 +163,7 @@ impl Manipulative<Field> {
         -1 // -inftyでも-1とする
     }
     pub fn diff(&self) -> Manipulative<Field> {
-        let mut new_factors = Vec::with_capacity(self.factors.len()-1);
+        let mut new_factors = Vec::with_capacity(self.factors.len() - 1);
         for (i, a) in self.factors.iter().enumerate() {
             if i != 0 {
                 new_factors.push(*a * i as i32);

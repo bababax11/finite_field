@@ -16,7 +16,7 @@ impl ops::Neg for Field {
     type Output = Field;
     fn neg(self) -> Self {
         Self {
-            v: (self.n as i32 -self.v) % self.n as i32,
+            v: (self.n as i32 - self.v) % self.n as i32,
             n: self.n,
         }
     }
