@@ -10,7 +10,6 @@ fn euclid_decrypt(p: u32, n: usize, d: usize, a: i32, y: Vec<i32>) -> Manipulati
     let mut r_m1 = vec![Field::new(0, p); d - 1];
     r_m1.push(Field::new(1, p));
     let mut r_m1 = Manipulative::new(r_m1);
-    println!("{:?}", r_m1);
 
     let mut r_0 = Vec::with_capacity(d - 2);
     let mut _a = Field::new(1, p);
@@ -19,7 +18,6 @@ fn euclid_decrypt(p: u32, n: usize, d: usize, a: i32, y: Vec<i32>) -> Manipulati
         r_0.push(y.apply(_a));
     }
     let mut r_0 = Manipulative::new(r_0);
-    println!("{:?}", r_0);
 
     if r_0.deg() == -1 { return y; }
     loop {
@@ -28,8 +26,6 @@ fn euclid_decrypt(p: u32, n: usize, d: usize, a: i32, y: Vec<i32>) -> Manipulati
         r_m1 = std::mem::replace(&mut r_0, _r_0);
         let _t_0 = t_0.clone();
         t_m1 = std::mem::replace(&mut t_0, t_m1.clone() - q * _t_0);
-        println!("{:?}", r_0);
-        println!("{:?}\n{:?}\n", t_m1, t_0);
         if r_0.deg() <= (d as i32 - 1) / 2 - 1 {
             break;
         }
