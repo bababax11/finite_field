@@ -16,7 +16,7 @@ impl ops::Neg for Field {
     type Output = Field;
     fn neg(self) -> Self {
         Self {
-            v: -self.v,
+            v: (self.n as i32 -self.v) % self.n as i32,
             n: self.n,
         }
     }
@@ -69,7 +69,7 @@ impl ops::Sub for Field {
     fn sub(self, other: Field) -> Self {
         assert_eq!(self.n, other.n);
         Self {
-            v: (self.v - other.v) % (self.n as i32),
+            v: (self.v - other.v + self.n as i32) % (self.n as i32),
             n: self.n,
         }
     }
@@ -77,7 +77,7 @@ impl ops::Sub for Field {
 impl ops::SubAssign for Field {
     fn sub_assign(&mut self, other: Field) {
         assert_eq!(self.n, other.n);
-        self.v = (self.v - other.v) % (self.n as i32);
+        self.v = (self.v - other.v + self.n as i32) % (self.n as i32);
     }
 }
 impl ops::Mul for Field {
@@ -106,6 +106,11 @@ impl ops::MulAssign for Field {
         self.v = (self.v * other.v) % (self.n as i32);
     }
 }
+impl ops::MulAssign<i32> for Field {
+    fn mul_assign(&mut self, other: i32) {
+        self.v = (self.v * other) % (self.n as i32);
+    }
+}
 impl ops::Div for Field {
     type Output = Field;
     fn div(self, other: Field) -> Self {
@@ -132,8 +137,8 @@ mod tests {
     }
     #[test]
     fn sub_test() {
-        let x = Field::new(1, 3) - Field::new(4, 3);
-        assert_eq!(x, Field::new(0, 3));
+        let x = Field::new(2, 3) - Field::new(4, 3);
+        assert_eq!(x, Field::new(1, 3));
     }
     #[test]
     fn mul_test() {
@@ -148,9 +153,14 @@ mod tests {
         assert_eq!(x, Field::new(1, 5));
     }
     #[test]
-    fn neg_test() {
+    fn not_test() {
         let x = !Field::new(1, 2);
         assert_eq!(x, Field::new(0, 2));
         assert_eq!(!x, Field::new(1, 2));
+    }
+    #[test]
+    fn neg_test() {
+        let x = -Field::new(2, 3);
+        assert_eq!(x, Field::new(1, 3));
     }
 }
