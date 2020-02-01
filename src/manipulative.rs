@@ -2,7 +2,7 @@ use super::modulo::Field;
 use std::ops::{Add, Div, Mul, Neg, Sub};
 use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 #[derive(Clone, Debug, PartialEq)]
-struct Manipulative<T>
+pub struct Manipulative<T>
 where
     T: Copy,
 {
@@ -10,13 +10,63 @@ where
 }
 impl<T> Manipulative<T>
 where
-    T: Copy + AddAssign + SubAssign + Neg<Output = T> + MulAssign + DivAssign + Default,
+    T: std::fmt::Debug
+        + Copy
+        + AddAssign
+        + SubAssign
+        + Neg<Output = T>
+        + Add<Output = T>
+        + Sub<Output = T>
+        + Mul<Output = T>
+        + Div<Output = T>
+        + Default
+        + Eq,
 {
     pub fn new(factors: Vec<T>) -> Self {
         if factors.len() == 0 {
             panic!("係数が空");
         }
         Self { factors: factors }
+    }
+    pub fn divide_by(&self, other: &Manipulative<T>) -> (Manipulative<T>, Manipulative<T>) {
+        let mut man_r = self.clone();
+        let mut q = Vec::with_capacity(self.factors.len());
+        q.resize_with(self.factors.len(), Default::default);
+        'outer: loop {
+            for (j, d) in other.factors.iter().enumerate().rev() {
+                if *d == Default::default() {
+                    continue;
+                }
+                let mut it = man_r.factors.iter().enumerate().rev();
+                let mut l;
+                let mut i;
+                while {
+                    let ll = it.next();
+                    match ll {
+                        Some((i_, l_)) => {
+                            l = *l_;
+                            i = i_;
+                            if i < j {
+                                break 'outer;
+                            }
+                            l == Default::default()
+                        }
+                        None => break 'outer,
+                    }
+                } {}
+                let a = l / *d;
+                unsafe {
+                    *q.get_unchecked_mut(i - j) = a;
+                }
+                let mut o = other.clone();
+                let mut v = vec![Default::default(); i - j];
+                v.push(a);
+                o *= Manipulative::new(v);
+                man_r -= o;
+                break;
+            }
+        }
+        (Manipulative::new(q), man_r)
     }
 }
 impl<T> AddAssign for Manipulative<T>
@@ -183,5 +233,44 @@ mod tests {
         let b = Manipulative::new(vec![1, 1]);
         assert_eq!((a.clone() * b.clone()).factors, [1, 3, 2]);
         assert_eq!((b * a).factors, [1, 3, 2]);
+    }
+    #[test]
+    fn div_test() {
+        let a = Manipulative::new(vec![1, 2, 1]);
+        let b = Manipulative::new(vec![1, 1]);
+        assert_eq!(
+            a.divide_by(&b),
+            (
+                Manipulative::new(vec![1, 1, 0]),
+                Manipulative::new(vec![0, 0, 0])
+            )
+        );
+        let a = Manipulative::new(vec![-2, -3, -1, 0]);
+        let b = Manipulative::new(vec![1, 1, 0, 0, 0]);
+        assert_eq!(
+            a.divide_by(&b),
+            (
+                Manipulative::new(vec![-2, -1, 0, 0]),
+                Manipulative::new(vec![0, 0, 0, 0, 0, 0])
+            )
+        );
+        let a = Manipulative::new(vec![2, 3, 1, 0]);
+        let b = Manipulative::new(vec![1, 0, 0]);
+        assert_eq!(
+            a.divide_by(&b),
+            (
+                Manipulative::new(vec![2, 3, 1, 0]),
+                Manipulative::new(vec![0, 0, 0, 0, 0])
+            )
+        );
+        let a = Manipulative::new(vec![2, 3, 1, 0]);
+        let b = Manipulative::new(vec![1, 1, 1, 0]);
+        assert_eq!(
+            a.divide_by(&b),
+            (
+                Manipulative::new(vec![1, 0, 0, 0]),
+                Manipulative::new(vec![1, 2, 0, 0])
+            )
+        );
     }
 }
