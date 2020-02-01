@@ -54,5 +54,10 @@ mod tests {
             w,
             Manipulative::new([4, 0, 2, 1].iter().map(|v| Field::new(*v, 5)).collect())
         );
+        let w = euclid_decrypt(11, 7, 5, 2, vec![1, -1, 1, 0, 3, 2, 0, 1]);
+        assert_eq!(
+            w,
+            Manipulative::new([1, 10, 1, 8, 3, 2, 5, 1].iter().map(|v| Field::new(*v, 11)).collect())
+        );
     }
 }
