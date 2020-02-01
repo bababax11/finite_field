@@ -104,8 +104,7 @@ impl Manipulative<Field> {
     ) -> Result<(Manipulative<Field>, Manipulative<Field>), &'static str> {
         let mut man_r = self.clone();
         let mut q = Vec::with_capacity(self.factors.len());
-        let mut default = unsafe { *self.factors.get_unchecked(0) };
-        default.v = 0;
+        let default = Field::new(0, unsafe { self.factors.get_unchecked(0).n });
         q.resize(self.factors.len(), default);
         let (j, d) = (|| {
             // otherの先頭要素を返す
@@ -145,6 +144,32 @@ impl Manipulative<Field> {
             man_r -= o;
         }
         Ok((Manipulative::new(q), man_r))
+    }
+    pub fn apply(&self, x: Field) -> Field {
+        let mut result = Field::new(0, x.n);
+        for a in self.factors.iter().rev() {
+            result *= x;
+            result += *a;
+        }
+        result
+    }
+    pub fn deg(&self) -> i32 {
+        let default = Field::new(0, unsafe { self.factors.get_unchecked(0).n });
+        for (i, d) in self.factors.iter().enumerate().rev() {
+            if *d != default {
+                return i as i32;
+            }
+        }
+        -1 // -inftyでも-1とする
+    }
+    pub fn diff(&self) -> Manipulative<Field> {
+        let mut new_factors = Vec::with_capacity(self.factors.len()-1);
+        for (i, a) in self.factors.iter().enumerate() {
+            if i != 0 {
+                new_factors.push(*a * i as i32);
+            }
+        }
+        Manipulative::new(new_factors)
     }
 }
 impl<T> AddAssign for Manipulative<T>
