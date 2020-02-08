@@ -151,11 +151,11 @@ impl Manipulative<Field> {
         }
         result
     }
-    pub fn deg(&self) -> i32 {
+    pub fn deg(&self) -> i64 {
         let default = Field::new(0, unsafe { self.factors.get_unchecked(0).n });
         for (i, d) in self.factors.iter().enumerate().rev() {
             if *d != default {
-                return i as i32;
+                return i as i64;
             }
         }
         -1 // -inftyでも-1とする
@@ -169,7 +169,7 @@ impl Manipulative<Field> {
         let mut new_factors = Vec::with_capacity(self.factors.len() - 1);
         for (i, a) in self.factors.iter().enumerate() {
             if i != 0 {
-                new_factors.push(*a * i as i32);
+                new_factors.push(*a * i as i64);
             }
         }
         Manipulative::new(new_factors)

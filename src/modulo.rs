@@ -1,13 +1,13 @@
 use std::ops;
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Field {
-    pub v: i32,
-    pub n: u32,
+    pub v: i64,
+    pub n: u64,
 }
 impl Field {
-    pub fn new(value: i32, n: u32) -> Self {
+    pub fn new(value: i64, n: u64) -> Self {
         Self {
-            v: value % (n as i32),
+            v: value % (n as i64),
             n: n,
         }
     }
@@ -16,7 +16,7 @@ impl ops::Neg for Field {
     type Output = Field;
     fn neg(self) -> Self {
         Self {
-            v: (self.n as i32 - self.v) % self.n as i32,
+            v: (self.n as i64 - self.v) % self.n as i64,
             n: self.n,
         }
     }
@@ -26,19 +26,19 @@ impl ops::Not for Field {
     fn not(self) -> Self {
         if self.n == 2 {
             Self {
-                v: (self.v == 0) as i32,
+                v: (self.v == 0) as i64,
                 n: 2,
             }
         } else {
             Self {
-                v: pow(self.v, (self.n - 2) as u32, self.n as i32),
+                v: pow(self.v, (self.n - 2) as u64, self.n as i64),
                 n: self.n,
             }
         }
     }
 }
 #[inline]
-fn pow(mut base: i32, mut exp: u32, p: i32) -> i32 {
+fn pow(mut base: i64, mut exp: u64, p: i64) -> i64 {
     let mut acc = 1;
 
     while exp > 1 {
@@ -59,17 +59,17 @@ impl ops::Add for Field {
     fn add(self, other: Field) -> Self {
         assert_eq!(self.n, other.n);
         Self {
-            v: (self.v + other.v) % (self.n as i32),
+            v: (self.v + other.v) % (self.n as i64),
             n: self.n,
         }
     }
 }
-impl ops::Add<i32> for Field {
+impl ops::Add<i64> for Field {
     type Output = Field;
 
-    fn add(self, other: i32) -> Self {
+    fn add(self, other: i64) -> Self {
         Self {
-            v: (self.v + other) % (self.n as i32),
+            v: (self.v + other) % (self.n as i64),
             n: self.n,
         }
     }
@@ -77,7 +77,7 @@ impl ops::Add<i32> for Field {
 impl ops::AddAssign for Field {
     fn add_assign(&mut self, other: Field) {
         // assert_eq!(self.n, other.n);
-        self.v = (self.v + other.v) % (self.n as i32);
+        self.v = (self.v + other.v) % (self.n as i64);
     }
 }
 impl ops::Sub for Field {
@@ -85,7 +85,7 @@ impl ops::Sub for Field {
     fn sub(self, other: Field) -> Self {
         // assert_eq!(self.n, other.n);
         Self {
-            v: (self.v - other.v + self.n as i32) % (self.n as i32),
+            v: (self.v - other.v + self.n as i64) % (self.n as i64),
             n: self.n,
         }
     }
@@ -93,7 +93,7 @@ impl ops::Sub for Field {
 impl ops::SubAssign for Field {
     fn sub_assign(&mut self, other: Field) {
         // assert_eq!(self.n, other.n);
-        self.v = (self.v - other.v + self.n as i32) % (self.n as i32);
+        self.v = (self.v - other.v + self.n as i64) % (self.n as i64);
     }
 }
 impl ops::Mul for Field {
@@ -101,17 +101,17 @@ impl ops::Mul for Field {
     fn mul(self, other: Field) -> Self {
         // assert_eq!(self.n, other.n);
         Self {
-            v: self.v * other.v % (self.n as i32),
+            v: self.v * other.v % (self.n as i64),
             n: self.n,
         }
     }
 }
-impl ops::Mul<i32> for Field {
+impl ops::Mul<i64> for Field {
     type Output = Field;
 
-    fn mul(self, other: i32) -> Self {
+    fn mul(self, other: i64) -> Self {
         Self {
-            v: (self.v * other) % (self.n as i32),
+            v: (self.v * other) % (self.n as i64),
             n: self.n,
         }
     }
@@ -119,12 +119,12 @@ impl ops::Mul<i32> for Field {
 impl ops::MulAssign for Field {
     fn mul_assign(&mut self, other: Field) {
         // assert_eq!(self.n, other.n);
-        self.v = (self.v * other.v) % (self.n as i32);
+        self.v = (self.v * other.v) % (self.n as i64);
     }
 }
-impl ops::MulAssign<i32> for Field {
-    fn mul_assign(&mut self, other: i32) {
-        self.v = (self.v * other) % (self.n as i32);
+impl ops::MulAssign<i64> for Field {
+    fn mul_assign(&mut self, other: i64) {
+        self.v = (self.v * other) % (self.n as i64);
     }
 }
 impl ops::Div for Field {

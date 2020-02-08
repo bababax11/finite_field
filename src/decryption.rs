@@ -18,7 +18,7 @@ use super::modulo::Field;
 ///     Manipulative::new([4, 0, 2, 1].iter().map(|v| Field::new(*v, 5)).collect()) // 4 + 2 x^2 + x^3
 ///);
 /// ```
-pub fn euclid_decrypt(p: u32, n: usize, d: usize, a: i32, y: &[i32]) -> Manipulative<Field> {
+pub fn euclid_decrypt(p: u64, n: usize, d: usize, a: i64, y: &[i64]) -> Manipulative<Field> {
     if 2 > d || d > n {
         panic!("dの範囲が2 <= d <= n でない")
     }
@@ -48,7 +48,7 @@ pub fn euclid_decrypt(p: u32, n: usize, d: usize, a: i32, y: &[i32]) -> Manipula
         r_m1 = std::mem::replace(&mut r_0, new_r_0);
         let new_t_0 = t_m1.clone() - &(&q * &t_0);
         t_m1 = std::mem::replace(&mut t_0, new_t_0);
-        if r_0.deg() <= (d as i32 - 1) / 2 - 1 {
+        if r_0.deg() <= (d as i64 - 1) / 2 - 1 {
             break;
         }
     }
