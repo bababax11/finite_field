@@ -230,8 +230,10 @@ where
         }
     }
 }
-impl MulAssign<&Manipulative<Field>> for Manipulative<Field> {
-    fn mul_assign(&mut self, other: &Manipulative<Field>) {
+impl Mul<&Manipulative<Field>> for &Manipulative<Field> {
+
+    type Output = Manipulative<Field>;
+    fn mul(self, other: &Manipulative<Field>) -> Manipulative<Field> {
         let deg = self.factors.len() + other.factors.len() - 1;
         let mut new_factors = Vec::with_capacity(deg);
         new_factors.resize(
@@ -245,14 +247,26 @@ impl MulAssign<&Manipulative<Field>> for Manipulative<Field> {
                 }
             }
         }
-        self.factors = new_factors;
+        Manipulative::new(new_factors)
     }
 }
-impl<T> MulAssign<&Manipulative<T>> for Manipulative<T>
+impl<T> Mul<&Manipulative<T>> for &Manipulative<T>
 where
-    T: Copy + Default + AddAssign + Mul<Output = T>,
+    T: std::fmt::Debug
+        + Copy
+        + AddAssign
+        + SubAssign
+        + Neg<Output = T>
+        + Add<Output = T>
+        + Sub<Output = T>
+        + Mul<Output = T>
+        + MulAssign
+        + Div<Output = T>
+        + Default
+        + PartialEq,
 {
-    fn mul_assign(&mut self, other: &Manipulative<T>) {
+    type Output = Manipulative<T>;
+    fn mul(self, other: &Manipulative<T>) -> Manipulative<T> {
         let deg = self.factors.len() + other.factors.len() - 1; // -1-1+1
         let mut new_factors = Vec::with_capacity(deg);
         new_factors.resize_with(deg, Default::default);
@@ -263,7 +277,7 @@ where
                 }
             }
         }
-        self.factors = new_factors;
+        Manipulative::new(new_factors)
     }
 }
 impl<T> Add<&Manipulative<T>> for Manipulative<T>
@@ -288,23 +302,31 @@ where
         self
     }
 }
-impl<T> Mul<&Manipulative<T>> for Manipulative<T>
+impl<T> MulAssign<&Manipulative<T>> for Manipulative<T>
 where
-    T: Copy + Default + AddAssign + Mul<Output = T>,
+    T: std::fmt::Debug
+        + Copy
+        + AddAssign
+        + SubAssign
+        + Neg<Output = T>
+        + Add<Output = T>
+        + Sub<Output = T>
+        + Mul<Output = T>
+        + MulAssign
+        + Div<Output = T>
+        + Default
+        + PartialEq,
 {
-    type Output = Manipulative<T>;
-
-    fn mul(mut self, other: &Manipulative<T>) -> Self {
-        self *= other;
-        self
+    fn mul_assign(&mut self, other: &Manipulative<T>) {
+        let new_factors = (&(*self) * other).factors;
+        self.factors = new_factors;
     }
 }
-impl Mul<&Manipulative<Field>> for Manipulative<Field> {
-    type Output = Manipulative<Field>;
+impl MulAssign<&Manipulative<Field>> for Manipulative<Field> {
 
-    fn mul(mut self, other: &Manipulative<Field>) -> Self {
-        self *= other;
-        self
+    fn mul_assign(&mut self, other: &Manipulative<Field>) {
+        let new_factors = (&(*self) * other).factors;
+        self.factors = new_factors;
     }
 }
 
@@ -330,8 +352,8 @@ mod tests {
     fn mul_test() {
         let a = Manipulative::new(vec![1, 2]);
         let b = Manipulative::new(vec![1, 1]);
-        assert_eq!((a.clone() * &b).factors, [1, 3, 2]);
-        assert_eq!((b * &a).factors, [1, 3, 2]);
+        assert_eq!((&a * &b).factors, [1, 3, 2]);
+        assert_eq!((&b * &a).factors, [1, 3, 2]);
     }
     #[test]
     fn div_test() {
