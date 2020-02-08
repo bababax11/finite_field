@@ -57,7 +57,7 @@ impl ops::Add for Field {
     type Output = Field;
 
     fn add(self, other: Field) -> Self {
-        assert_eq!(self.n, other.n);
+        // assert_eq!(self.n, other.n);
         Self {
             v: (self.v + other.v) % (self.n as i64),
             n: self.n,
