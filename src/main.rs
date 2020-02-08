@@ -16,7 +16,7 @@ fn main() {
 
     // 過去問の問題のユークリッド復号
     let w = euclid_decrypt(11, 7, 5, 2, &[1, -1, 1, 0, 3, 2, 0, 1]);
-    println!("{:?}", w);
+    println!("{}", w);
     assert_eq!(
         w,
         Manipulative::new(

@@ -1,10 +1,8 @@
 use super::modulo::Field;
+use std::fmt;
 use std::ops::{Add, AddAssign, Div, Mul, MulAssign, Neg, Sub, SubAssign};
 #[derive(Clone, Debug, PartialEq)]
-pub struct Manipulative<T>
-where
-    T: Copy,
-{
+pub struct Manipulative<T> {
     factors: Vec<T>,
 }
 impl<T> Manipulative<T>
@@ -163,6 +161,11 @@ impl Manipulative<Field> {
         -1 // -inftyでも-1とする
     }
     pub fn diff(&self) -> Manipulative<Field> {
+        if self.factors.len() == 1 {
+            return Manipulative::new(vec![Field::new(0, unsafe {
+                self.factors.get_unchecked(0).n
+            })]);
+        }
         let mut new_factors = Vec::with_capacity(self.factors.len() - 1);
         for (i, a) in self.factors.iter().enumerate() {
             if i != 0 {
@@ -231,7 +234,6 @@ where
     }
 }
 impl Mul<&Manipulative<Field>> for &Manipulative<Field> {
-
     type Output = Manipulative<Field>;
     fn mul(self, other: &Manipulative<Field>) -> Manipulative<Field> {
         let deg = self.factors.len() + other.factors.len() - 1;
@@ -323,10 +325,46 @@ where
     }
 }
 impl MulAssign<&Manipulative<Field>> for Manipulative<Field> {
-
     fn mul_assign(&mut self, other: &Manipulative<Field>) {
         let new_factors = (&(*self) * other).factors;
         self.factors = new_factors;
+    }
+}
+impl<T: PartialEq + fmt::Display + Default> fmt::Display for Manipulative<T> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for (i, l) in self.factors.iter().enumerate().rev() {
+            if *l != Default::default() {
+                if i > 1 {
+                    let _ = write!(f, "{} x^{} + ", l, i);
+                } else if i == 1 {
+                    let _ = write!(f, "{} x + ", l);
+                } else {
+                    let _ = write!(f, "{}", l);
+                }
+            } else if i == 0 {
+                let _ = write!(f, "{}", l);
+            }
+        }
+        write!(f, "")
+    }
+}
+impl fmt::Display for Manipulative<Field> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let default = Field::new(0, unsafe { self.factors.get_unchecked(0).n });
+        for (i, l) in self.factors.iter().enumerate().rev() {
+            if *l != default {
+                if i > 1 {
+                    let _ = write!(f, "{} x^{} + ", (*l).v, i);
+                } else if i == 1 {
+                    let _ = write!(f, "{} x + ", (*l).v);
+                } else {
+                    let _ = write!(f, "{}", (*l).v);
+                }
+            } else if i == 0 {
+                let _ = write!(f, "{}", (*l).v);
+            }
+        }
+        write!(f, "")
     }
 }
 
