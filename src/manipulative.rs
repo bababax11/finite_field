@@ -83,8 +83,8 @@ where
             let mut o = other.clone();
             let mut v = vec![Default::default(); i - j];
             v.push(a);
-            o *= Manipulative::new(v);
-            man_r -= o;
+            o *= &Manipulative::new(v);
+            man_r -= &o;
         }
         Ok((Manipulative::new(q), man_r))
     }
@@ -140,8 +140,8 @@ impl Manipulative<Field> {
             let mut o = other.clone();
             let mut v = vec![default; i - j];
             v.push(a);
-            o *= Manipulative::new(v);
-            man_r -= o;
+            o *= &Manipulative::new(v);
+            man_r -= &o;
         }
         Ok((Manipulative::new(q), man_r))
     }
@@ -172,11 +172,11 @@ impl Manipulative<Field> {
         Manipulative::new(new_factors)
     }
 }
-impl<T> AddAssign for Manipulative<T>
+impl<T> AddAssign<&Manipulative<T>> for Manipulative<T>
 where
     T: Copy + AddAssign,
 {
-    fn add_assign(&mut self, other: Manipulative<T>) {
+    fn add_assign(&mut self, other: &Manipulative<T>) {
         let min_deg;
         let max_deg;
         let is_self_shorter;
@@ -201,11 +201,11 @@ where
         }
     }
 }
-impl<T> SubAssign for Manipulative<T>
+impl<T> SubAssign<&Manipulative<T>> for Manipulative<T>
 where
     T: Copy + SubAssign + Neg<Output = T>,
 {
-    fn sub_assign(&mut self, other: Manipulative<T>) {
+    fn sub_assign(&mut self, other: &Manipulative<T>) {
         let min_deg;
         let max_deg;
         let is_self_shorter;
@@ -230,8 +230,8 @@ where
         }
     }
 }
-impl MulAssign for Manipulative<Field> {
-    fn mul_assign(&mut self, other: Manipulative<Field>) {
+impl MulAssign<&Manipulative<Field>> for Manipulative<Field> {
+    fn mul_assign(&mut self, other: &Manipulative<Field>) {
         let deg = self.factors.len() + other.factors.len() - 1;
         let mut new_factors = Vec::with_capacity(deg);
         new_factors.resize(
@@ -248,11 +248,11 @@ impl MulAssign for Manipulative<Field> {
         self.factors = new_factors;
     }
 }
-impl<T> MulAssign for Manipulative<T>
+impl<T> MulAssign<&Manipulative<T>> for Manipulative<T>
 where
     T: Copy + Default + AddAssign + Mul<Output = T>,
 {
-    fn mul_assign(&mut self, other: Manipulative<T>) {
+    fn mul_assign(&mut self, other: &Manipulative<T>) {
         let deg = self.factors.len() + other.factors.len() - 1; // -1-1+1
         let mut new_factors = Vec::with_capacity(deg);
         new_factors.resize_with(deg, Default::default);
@@ -266,49 +266,45 @@ where
         self.factors = new_factors;
     }
 }
-impl<T> Add for Manipulative<T>
+impl<T> Add<&Manipulative<T>> for Manipulative<T>
 where
     T: Copy + AddAssign,
 {
     type Output = Manipulative<T>;
 
-    fn add(self, other: Manipulative<T>) -> Self {
-        let mut result = self.clone();
-        result += other;
-        result
+    fn add(mut self, other: &Manipulative<T>) -> Self {
+        self += other;
+        self
     }
 }
-impl<T> Sub for Manipulative<T>
+impl<T> Sub<&Manipulative<T>> for Manipulative<T>
 where
     T: Copy + SubAssign + Neg<Output = T>,
 {
     type Output = Manipulative<T>;
 
-    fn sub(self, other: Manipulative<T>) -> Self {
-        let mut result = self.clone();
-        result -= other;
-        result
+    fn sub(mut self, other: &Manipulative<T>) -> Self {
+        self -= other;
+        self
     }
 }
-impl<T> Mul for Manipulative<T>
+impl<T> Mul<&Manipulative<T>> for Manipulative<T>
 where
     T: Copy + Default + AddAssign + Mul<Output = T>,
 {
     type Output = Manipulative<T>;
 
-    fn mul(self, other: Manipulative<T>) -> Self {
-        let mut result = self.clone();
-        result *= other;
-        result
+    fn mul(mut self, other: &Manipulative<T>) -> Self {
+        self *= other;
+        self
     }
 }
-impl Mul for Manipulative<Field> {
+impl Mul<&Manipulative<Field>> for Manipulative<Field> {
     type Output = Manipulative<Field>;
 
-    fn mul(self, other: Manipulative<Field>) -> Self {
-        let mut result = self.clone();
-        result *= other;
-        result
+    fn mul(mut self, other: &Manipulative<Field>) -> Self {
+        self *= other;
+        self
     }
 }
 
@@ -320,22 +316,22 @@ mod tests {
     fn add_test() {
         let a = Manipulative::new(vec![1, 5]);
         let b = Manipulative::new(vec![2, 2, 3]);
-        assert_eq!((a.clone() + b.clone()).factors, [3, 7, 3]);
-        assert_eq!((b + a).factors, [3, 7, 3]);
+        assert_eq!((a.clone() + &b).factors, [3, 7, 3]);
+        assert_eq!((b + &a).factors, [3, 7, 3]);
     }
     #[test]
     fn sub_test() {
         let a = Manipulative::new(vec![1, 5]);
         let b = Manipulative::new(vec![2, 2, 3]);
-        assert_eq!((a.clone() - b.clone()).factors, [-1, 3, -3]);
-        assert_eq!((b - a).factors, [1, -3, 3]);
+        assert_eq!((a.clone() - &b).factors, [-1, 3, -3]);
+        assert_eq!((b - &a).factors, [1, -3, 3]);
     }
     #[test]
     fn mul_test() {
         let a = Manipulative::new(vec![1, 2]);
         let b = Manipulative::new(vec![1, 1]);
-        assert_eq!((a.clone() * b.clone()).factors, [1, 3, 2]);
-        assert_eq!((b * a).factors, [1, 3, 2]);
+        assert_eq!((a.clone() * &b).factors, [1, 3, 2]);
+        assert_eq!((b * &a).factors, [1, 3, 2]);
     }
     #[test]
     fn div_test() {

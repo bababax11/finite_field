@@ -46,8 +46,8 @@ pub fn euclid_decrypt(p: u32, n: usize, d: usize, a: i32, y: &[i32]) -> Manipula
     loop {
         let (q, _r_0) = r_m1.divide_by(&r_0).unwrap();
         r_m1 = std::mem::replace(&mut r_0, _r_0);
-        let _t_0 = t_0.clone();
-        t_m1 = std::mem::replace(&mut t_0, t_m1.clone() - q * _t_0);
+        let tt = t_m1.clone() - &(q * &t_0);
+        t_m1 = std::mem::replace(&mut t_0, tt);
         if r_0.deg() <= (d as i32 - 1) / 2 - 1 {
             break;
         }
@@ -61,7 +61,7 @@ pub fn euclid_decrypt(p: u32, n: usize, d: usize, a: i32, y: &[i32]) -> Manipula
             *e -= r_0.assign(_a) / t_0.diff().assign(_a)
         }
     }
-    y -= Manipulative::new(err);
+    y -= &Manipulative::new(err);
     y
 }
 #[cfg(test)]
