@@ -31,11 +31,27 @@ impl ops::Not for Field {
             }
         } else {
             Self {
-                v: self.v.pow((self.n - 2) as u32) % (self.n as i32),
+                v: pow(self.v, (self.n - 2) as u32, self.n as i32),
                 n: self.n,
             }
         }
     }
+}
+#[inline]
+fn pow(mut base: i32, mut exp: u32, p: i32) -> i32 {
+    let mut acc = 1;
+
+    while exp > 1 {
+        if (exp & 1) == 1 {
+            acc = acc * base % p;
+        }
+        exp /= 2;
+        base = base * base % p;
+    }
+    if exp == 1 {
+        acc = acc * base % p;
+    }
+    acc
 }
 impl ops::Add for Field {
     type Output = Field;
