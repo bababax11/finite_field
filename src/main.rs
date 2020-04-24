@@ -1,7 +1,9 @@
-extern crate finite_field;
-use finite_field::decryption::euclid_decrypt;
-use finite_field::manipulative::Manipulative;
-use finite_field::modulo::Field;
+mod decryption;
+mod manipulative;
+mod modulo;
+use decryption::euclid_decrypt;
+use manipulative::Manipulative;
+use modulo::Field;
 fn main() {
     // 整式の割り算
     let a = Manipulative::new(vec![1, 2, 1]);
