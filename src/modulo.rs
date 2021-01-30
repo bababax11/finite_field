@@ -1,38 +1,37 @@
 use std::ops;
+use typenum::{Unsigned};
 #[derive(Copy, Clone, Debug, PartialEq)]
-pub struct Field {
+pub struct Field<N: Unsigned> {
     pub v: i64,
-    pub n: u64,
 }
-impl Field {
-    pub fn new(value: i64, n: u64) -> Self {
+impl<N: Unsigned> Field<N> {
+    pub fn new(value: i64) -> Self {
         Self {
-            v: value % (n as i64),
-            n: n,
+            v: value % N::to_i64(),
         }
     }
+    fn n(&self) -> u64 {
+        N::to_u64()
+    }
 }
-impl ops::Neg for Field {
-    type Output = Field;
+impl<N: Unsigned> ops::Neg for Field<N> {
+    type Output = Field<N>;
     fn neg(self) -> Self {
         Self {
-            v: (self.n as i64 - self.v) % self.n as i64,
-            n: self.n,
+            v: (self.n() as i64 - self.v) % self.n() as i64,
         }
     }
 }
-impl ops::Not for Field {
-    type Output = Field;
+impl<N: Unsigned> ops::Not for Field<N> {
+    type Output = Field<N>;
     fn not(self) -> Self {
-        if self.n == 2 {
+        if self.n() == 2 {
             Self {
                 v: (self.v == 0) as i64,
-                n: 2,
             }
         } else {
             Self {
-                v: pow(self.v, (self.n - 2) as u64, self.n as i64),
-                n: self.n,
+                v: pow(self.v, (self.n() - 2) as u64, self.n() as i64),
             }
         }
     }
@@ -53,89 +52,85 @@ fn pow(mut base: i64, mut exp: u64, p: i64) -> i64 {
     }
     acc
 }
-impl ops::Add for Field {
-    type Output = Field;
+impl<N: Unsigned> ops::Add for Field<N> {
+    type Output = Field<N>;
 
-    fn add(self, other: Field) -> Self {
+    fn add(self, other: Field<N>) -> Self {
         // assert_eq!(self.n, other.n);
         Self {
-            v: (self.v + other.v) % (self.n as i64),
-            n: self.n,
+            v: (self.v + other.v) % (self.n() as i64),
         }
     }
 }
-impl ops::Add<i64> for Field {
-    type Output = Field;
+impl<N: Unsigned> ops::Add<i64> for Field<N> {
+    type Output = Field<N>;
 
     fn add(self, other: i64) -> Self {
         Self {
-            v: (self.v + other) % (self.n as i64),
-            n: self.n,
+            v: (self.v + other) % (self.n() as i64),
         }
     }
 }
-impl ops::AddAssign for Field {
-    fn add_assign(&mut self, other: Field) {
+impl<N: Unsigned> ops::AddAssign for Field<N> {
+    fn add_assign(&mut self, other: Field<N>) {
         // assert_eq!(self.n, other.n);
-        self.v = (self.v + other.v) % (self.n as i64);
+        self.v = (self.v + other.v) % (self.n() as i64);
     }
 }
-impl ops::Sub for Field {
-    type Output = Field;
-    fn sub(self, other: Field) -> Self {
+impl<N: Unsigned> ops::Sub for Field<N> {
+    type Output = Field<N>;
+    fn sub(self, other: Field<N>) -> Self {
         // assert_eq!(self.n, other.n);
         Self {
-            v: (self.v - other.v + self.n as i64) % (self.n as i64),
+            v: (self.v - other.v + self.n() as i64) % (self.n() as i64),
             n: self.n,
         }
     }
 }
-impl ops::SubAssign for Field {
-    fn sub_assign(&mut self, other: Field) {
+impl<N: Unsigned> ops::SubAssign for Field<N> {
+    fn sub_assign(&mut self, other: Field<N>) {
         // assert_eq!(self.n, other.n);
-        self.v = (self.v - other.v + self.n as i64) % (self.n as i64);
+        self.v = (self.v - other.v + self.n() as i64) % (self.n() as i64);
     }
 }
-impl ops::Mul for Field {
-    type Output = Field;
-    fn mul(self, other: Field) -> Self {
+impl<N: Unsigned> ops::Mul for Field<N> {
+    type Output = Field<N>;
+    fn mul(self, other: Field<N>) -> Self {
         // assert_eq!(self.n, other.n);
         Self {
-            v: self.v * other.v % (self.n as i64),
-            n: self.n,
+            v: self.v * other.v % (self.n() as i64),
         }
     }
 }
-impl ops::Mul<i64> for Field {
-    type Output = Field;
+impl<N: Unsigned> ops::Mul<i64> for Field<N> {
+    type Output = Field<N>;
 
     fn mul(self, other: i64) -> Self {
         Self {
-            v: (self.v * other) % (self.n as i64),
-            n: self.n,
+            v: (self.v * other) % (self.n() as i64),
         }
     }
 }
-impl ops::MulAssign for Field {
-    fn mul_assign(&mut self, other: Field) {
+impl<N: Unsigned> ops::MulAssign for Field<N> {
+    fn mul_assign(&mut self, other: Field<N>) {
         // assert_eq!(self.n, other.n);
-        self.v = (self.v * other.v) % (self.n as i64);
+        self.v = (self.v * other.v) % (self.n() as i64);
     }
 }
-impl ops::MulAssign<i64> for Field {
+impl<N: Unsigned> ops::MulAssign<i64> for Field<N> {
     fn mul_assign(&mut self, other: i64) {
-        self.v = (self.v * other) % (self.n as i64);
+        self.v = (self.v * other) % (self.n() as i64);
     }
 }
-impl ops::Div for Field {
-    type Output = Field;
-    fn div(self, other: Field) -> Self {
+impl<N: Unsigned> ops::Div for Field<N> {
+    type Output = Field<N>;
+    fn div(self, other: Field<N>) -> Self {
         // assert_eq!(self.n, other.n);
         self * (!other)
     }
 }
-impl ops::DivAssign for Field {
-    fn div_assign(&mut self, other: Field) {
+impl<N: Unsigned> ops::DivAssign for Field<N> {
+    fn div_assign(&mut self, other: Field<N>) {
         // assert_eq!(self.n, other.n);
         *self *= !other;
     }
@@ -143,13 +138,14 @@ impl ops::DivAssign for Field {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use typenum::{U3};
 
     #[test]
     fn add_test() {
-        let mut x = Field::new(1, 3) + Field::new(4, 3);
-        assert_eq!(x, Field::new(2, 3));
+        let mut x = Field::<U3>::new(1) + Field::<U3>::new(4);
+        assert_eq!(x, Field::<U3>::new(2));
         x += x.clone();
-        assert_eq!(x, Field::new(1, 3));
+        assert_eq!(x, Field::<U3>::new(1));
     }
     #[test]
     fn sub_test() {
